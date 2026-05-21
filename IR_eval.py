@@ -22,6 +22,7 @@ Author: Philippe Mulhem
 Email: Philippe.Mulhem@imag.fr
 Affiliation: MRIM-LIG, Centre National de la Recherche Scientifique
 License: MIT
+Version 1.0.3  (adding the process of several answers fr one query)
 Version: 1.0.2 (modifs arg processing et text file save)
 Date: 2024-05-07
 Contributors: /
@@ -127,7 +128,10 @@ def process_submission(data):
         run_id = entry['metadata']['run_id']
         qid = entry['metadata']['narrative_id']
         answer = entry['answer'][0]['text']
-        citations = entry['answer'][0]['citations']
+        #citations = entry['answer'][0]['citations'] # old version, assuming ONE answer
+        citations = []      # v2 assuming several answers
+        for answ in entry['answer']:
+            citations.extend(answ['citations'])
         refs = entry['references']
         cit_id[qid] = {}
         for i in citations:
@@ -320,7 +324,7 @@ def main(req_sub_keys, gt_req_keys):
     args = parser.parse_args()
     # the processing calls
     submission_data_for_prec=get_submission(args.submission, req_sub_keys) # load submission
-    print(submission_data_for_prec)
+    # print(submission_data_for_prec)
     groundtruth_data_for_prec=get_groundtruth(args.gold, gt_req_keys) #load groundtruth
     compute_and_save_prec_scores(groundtruth_data_for_prec, submission_data_for_prec,args.outdir) #processing and save
 
